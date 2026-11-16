@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrAL - Gradu Amaierako Lana</title>
+    <style>
+        :root {
+            --primary: #1b4f8a;
+            --primary-dark: #123760;
+            --primary-light: #e9f1fa;
+            --accent: #e8a317;
+            --text: #1f2937;
+            --muted: #5b6676;
+            --border: #d8e0ea;
+            --bg: #f5f8fc;
+            --white: #ffffff;
+            --radius: 12px;
+            --shadow: 0 2px 8px rgba(18, 55, 96, 0.08);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
+            line-height: 1.65;
+            color: var(--text);
+            background: var(--bg);
+        }
+
+        a { color: var(--primary); }
+        a:focus-visible, button:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+        /* ---------- Goiko barra ---------- */
+        .topbar {
+            background: var(--primary);
+            color: var(--white);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .topbar-inner {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            padding: 0.75rem 0;
+            color: var(--white);
+            text-decoration: none;
+        }
+        .brand span { color: var(--accent); }
+
+        .menu { display: flex; gap: 0.2rem; }
+        .menu a {
+            color: var(--white);
+            text-decoration: none;
+            padding: 1.15rem 0.9rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            border-bottom: 4px solid transparent;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .menu a:hover { background: var(--primary-dark); }
+        .menu a.active { background: var(--primary-dark); border-bottom-color: var(--accent); }
+
+        .menu-btn {
+            display: none;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            padding: 0.45rem 0.55rem;
+            cursor: pointer;
+        }
+        .menu-btn span {
+            display: block;
+            width: 24px;
+            height: 3px;
+            background: var(--white);
+            margin: 4px 0;
+            border-radius: 2px;
+            transition: transform 0.25s, opacity 0.25s;
+        }
+        .menu-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+        .menu-btn.open span:nth-child(2) { opacity: 0; }
+        .menu-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+        @media (max-width: 760px) {
+            .menu-btn { display: block; }
+            .menu { display: none; flex-direction: column; width: 100%; padding-bottom: 0.6rem; }
+            .menu.open { display: flex; }
+            .menu a { padding: 0.85rem 0.6rem; border-bottom: none; border-left: 4px solid transparent; border-radius: 6px; }
+            .menu a.active { border-left-color: var(--accent); }
+        }
+
+        /* ---------- Edukia ---------- */
+        main { max-width: 1000px; margin: 0 auto; padding: 2rem 1.2rem; min-height: 60vh; }
+
+        .page-view { display: none; }
+        .page-view.active-page { display: block; animation: fade 0.3s ease; }
+        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+        h1 { color: var(--primary-dark); font-size: 2rem; margin: 0 0 0.3rem; }
+        h1::after { content: ""; display: block; width: 60px; height: 4px; background: var(--accent); border-radius: 2px; margin-top: 0.5rem; }
+        h2 { color: var(--primary); font-size: 1.35rem; margin: 2rem 0 0.8rem; }
+        h3 { color: var(--primary-dark); margin: 0 0 0.4rem; }
+        p { margin: 0.7rem 0; }
+
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.3rem 1.5rem;
+            margin: 1rem 0;
+        }
+
+        /* Hasiera */
+        .hero {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--white);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow);
+        }
+        .hero h1 { color: var(--white); font-size: 2.3rem; }
+        .hero p { font-size: 1.1rem; max-width: 650px; color: #e3ecf6; }
+
+        .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.5rem 0; }
+        .stat {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-top: 4px solid var(--accent);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.2rem;
+            text-align: center;
+        }
+        .stat strong { display: block; font-size: 2.2rem; color: var(--primary); line-height: 1.1; }
+        .stat span { color: var(--muted); font-size: 0.95rem; }
+        @media (max-width: 600px) { .stats { grid-template-columns: 1fr; } }
+
+        .notice {
+            background: var(--primary-light);
+            border-left: 5px solid var(--primary);
+            border-radius: 8px;
+            padding: 1rem 1.2rem;
+            margin: 1.2rem 0;
+        }
+
+        /* Araudia */
+        .rule-list { list-style: none; padding: 0; margin: 0; }
+        .rule-list li { padding: 0.8rem 0 0.8rem 1.6rem; border-bottom: 1px solid var(--border); position: relative; }
+        .rule-list li:last-child { border-bottom: none; }
+        .rule-list li::before { content: ""; position: absolute; left: 0; top: 1.4rem; width: 9px; height: 9px; background: var(--accent); border-radius: 50%; }
+        .rule-list strong { color: var(--primary-dark); }
+
+        /* Deialdiak */
+        .file-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: var(--primary);
+            color: var(--white);
+            text-decoration: none;
+            font-weight: 600;
+            padding: 0.7rem 1.2rem;
+            border-radius: 8px;
+            transition: background 0.2s, transform 0.2s;
+        }
+        .file-link:hover { background: var(--primary-dark); transform: translateY(-1px); }
+
+        /* Memoriak */
+        .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.2rem; margin-top: 1.2rem; }
+        @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+        .project { margin: 0; display: flex; flex-direction: column; border-top: 4px solid var(--primary); }
+        .project .date { color: var(--accent); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .project .title { font-style: italic; color: var(--muted); font-size: 0.95rem; }
+        .project .meta { font-size: 0.92rem; margin: 0.4rem 0; }
+        .project .meta strong { color: var(--primary-dark); }
+        .tag {
+            display: inline-block;
+            background: var(--primary-light);
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.2rem 0.7rem;
+            border-radius: 20px;
+            margin-top: auto;
+            align-self: flex-start;
+        }
+        .project .goal { font-size: 0.95rem; }
+
+        /* Autoebaluazioa */
+        .btn {
+            display: inline-block;
+            background: var(--accent);
+            color: #2b2000;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 0.9rem 1.6rem;
+            border-radius: 8px;
+            margin-top: 0.5rem;
+            transition: filter 0.2s, transform 0.2s;
+        }
+        .btn:hover { filter: brightness(0.93); transform: translateY(-1px); }
+
+        /* About us */
+        .team { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1rem 0; }
+        @media (max-width: 700px) { .team { grid-template-columns: 1fr; } }
+        .member { text-align: center; margin: 0; }
+        .avatar {
+            width: 64px; height: 64px;
+            margin: 0 auto 0.6rem;
+            border-radius: 50%;
+            background: var(--primary);
+            color: var(--white);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.3rem; font-weight: 700;
+            border: 3px solid var(--accent);
+        }
+        .member strong { color: var(--primary-dark); }
+
+        /* Oina */
+        footer { background: var(--primary-dark); color: #d6e2f0; text-align: center; padding: 2rem 1rem; margin-top: 2rem; font-size: 0.92rem; }
+        footer p { margin: 0.3rem 0; }
+        footer .first { color: var(--white); font-weight: 600; }
+        footer .social { margin-top: 0.8rem; display: flex; justify-content: center; flex-wrap: wrap; gap: 0.5rem; }
+        footer .social span { border: 1px solid rgba(255, 255, 255, 0.35); border-radius: 20px; padding: 0.15rem 0.8rem; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a class="brand" href="#" onclick="navigatePage(event, 'hasiera')">Gr<span>AL</span></a>
+            <button class="menu-btn" id="menuBtn" aria-label="Menua ireki edo itxi" aria-expanded="false" onclick="toggleMenu()">
+                <span></span><span></span><span></span>
+            </button>
+            <nav class="menu" id="menu">
+                <a href="#" class="active" data-page="hasiera" onclick="navigatePage(event, 'hasiera')">Hasiera</a>
+                <a href="#" data-page="araudia" onclick="navigatePage(event, 'araudia')">Araudia</a>
+                <a href="#" data-page="deialdiak" onclick="navigatePage(event, 'deialdiak')">Deialdiak</a>
+                <a href="#" data-page="memoriak" onclick="navigatePage(event, 'memoriak')">Memoriak</a>
+                <a href="#" data-page="autoebaluazioa" onclick="navigatePage(event, 'autoebaluazioa')">Autoebaluazioa</a>
+                <a href="#" data-page="aboutus" onclick="navigatePage(event, 'aboutus')">About us</a>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+
+        <!-- HASIERA -->
+        <div id="page-hasiera" class="page-view active-page">
+            <section class="hero">
+                <h1>Gradu amaierako lana:</h1>
+                <p>Gradu amaierako lana Informatika Ingeniaritzako gradua lortzeko beharrezkoa da. Laugarren mailan egiten da eta graduan zehar eskuratutako ezagutzak eta trebetasunak islatzen ditu.</p>
+            </section>
+
+            <div class="stats">
+                <div class="stat"><strong>12</strong><span>kreditu</span></div>
+                <div class="stat"><strong>168</strong><span>kreditu gainditurik hasteko</span></div>
+                <div class="stat"><strong>4.</strong><span>maila</span></div>
+            </div>
+
+            <div class="notice">Webgune honek GrAL lanari buruzko informazioa eta baliabideak eskaintzen ditu, Informatika Ingeniaritzako ikasleentzat eta irakasleentzat.</div>
+        </div>
+
+        <!-- ARAUDIA -->
+        <div id="page-araudia" class="page-view">
+            <h1>Araudia</h1>
+
+            <h2>Araudi orokorra</h2>
+            <div class="card">
+                <ul class="rule-list">
+                    <li><strong>Baldintzak:</strong> Ikasle bakoitzak GrAL lana bakarka eta autonomiaz egiten du, irakasle baten laguntzarekin. Lanean matrikulatzeko, 168 kreditu gainditurik izan behar dira: 60 oinarrizkoak, 66 derrigorrezkoak eta 42 aukerakoak.</li>
+                    <li><strong>Matrikula eta deialdiak:</strong> Matrikula ohiko matrikula-epean egiten da, eta ikasturte bakoitzean bi deialdi ofizial egiteko eskubidea ematen du. Baldintzak betetzen dituzten ikasleek gradu amaierako lanerako deialdi extraordinarioa ere eskatu dezakete.</li>
+                    <li><strong>Zuzendaritza:</strong> Zuzendaria ikasleari esleitutako irakasle bat da. Lanak kanpoko erakundeetan ere egin daitezke, lankidetza-hitzarmenen bidez.</li>
+                    <li><strong>Etika:</strong> Lanak gizakiak, datu pertsonalak edo animaliak baditu tartean, Etika Batzordearen jarraibideak bete behar dira.</li>
+                    <li><strong>GJHak:</strong> Lan guztiek gutxienez 200 hitzeko atal bat izan behar dute, Garapen Jasangarrirako Helburuekin eta balio demokratikoekin duen lotura azaltzeko.</li>
+                    <li><strong>Defentsa eta kalifikazioa:</strong> Lana paperean edo formatu digitalean aurkezten da. Defentsa publikoa eta aurrez aurrekoa da, hiru irakasleko epaimahai baten aurrean. Kalifikazioa 0tik 10era bitartekoa da.</li>
+                </ul>
+            </div>
+
+            <h2>Informatika Ingeniaritzako gradua: araudia</h2>
+            <div class="card">
+                <ul class="rule-list">
+                    <li>GrAL lanak 12 kreditu ditu. Defendatzeko, gehienez 3 aukerako irakasgai (18 kreditu) izan daitezke gainditu gabe.</li>
+                    <li>Lanek hiru espezialitateetako batean sartu behar dute: Software Ingeniaritza, Konputazioa edo Konputagailuen Ingeniaritza.</li>
+                    <li>Memoria formatu digitalean aurkezten da, ADDI plataformaren bidez. Fakultateko aretorako poster bertikal bat egitea gomendatzen da.</li>
+                    <li>Defentsa publikoa da. Ikasleak 20 eta 30 minutu artean ditu lana aurkeztu eta frogatzeko.</li>
+                    <li>Lana euskaraz, gaztelaniaz edo ingelesez idatz daiteke. Memoriak eta defentsak hizkuntza bera erabili behar dute.</li>
+                    <li>Epaimahaiak hiru kide ditu: lehendakaria, kidea eta idazkaria (lanaren zuzendaria).</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- DEIALDIAK -->
+        <div id="page-deialdiak" class="page-view">
+            <h1>Deialdiak</h1>
+            <div class="card">
+                <p>Iraileko deialdirako pertsona bakoitzaren defentsa ordutegia:</p>
+                <a class="file-link" href="#">&#128196; Ordutegia.pdf</a>
+            </div>
+        </div>
+
+        <!-- MEMORIAK -->
+        <div id="page-memoriak" class="page-view">
+            <h1>Memoriak</h1>
+
+            <div class="grid">
+                <article class="card project">
+                    <span class="date">2020/2021</span>
+                    <h3>GidabotApp</h3>
+                    <p class="title">GidaBot nabigazio-sistema erabiliz barruko ingurunetan erabiltzaileak gidatzen dituen aplikazio baten garapena eta integrazioa.</p>
+                    <p class="meta"><strong>Egilea:</strong> Iosu Sánchez Errazkin<br><strong>Zuzendariak:</strong> Ekaitz Jauregi eta Igor Rodriguez</p>
+                    <p class="goal">Donostiako fakultate-eraikineko erabiltzaileek gidari-robota beren kokalekura dei dezaketen Android aplikazioa sortzea, eta robotak nahi duten gelara gidatzea.</p>
+                    <span class="tag">Software Ingeniaritza</span>
+                </article>
+
+                <article class="card project">
+                    <span class="date">2021, iraila</span>
+                    <h3>OSALAGUN</h3>
+                    <p class="title">Ezagutza medikoa kudeatu eta kontsultatzeko web-zerbitzuetan oinarritutako sistema.</p>
+                    <p class="meta"><strong>Egilea:</strong> Mikel Echeverria Semperena<br><strong>Zuzendaria:</strong> Juan Manuel Pikatza Atxa</p>
+                    <p class="goal">Osasun-gomendioak eta informazio medikoa edonondik eskuratzeko web sistema baten azpiegitura diseinatzea eta prototipo bat eraikitzea.</p>
+                    <span class="tag">Software Ingeniaritza</span>
+                </article>
+
+                <article class="card project">
+                    <span class="date">2022-2023</span>
+                    <h3>Diabetesaren kudeaketarako aplikazioaren hobekuntza</h3>
+                    <p class="title">Diabetesa kudeatzeko kode irekiko aplikazio bati intsulina-dosia indartze-ikaskuntzaren bidez automatikoki kalkulatzen duen funtzionalitate berri bat gehitzea.</p>
+                    <p class="meta"><strong>Egilea:</strong> Unai Hurtado Pelaez<br><strong>Zuzendariak:</strong> Iñigo Mendialdua eta Iñigo Perona</p>
+                    <p class="goal">xDrip aplikazioari adimen artifiziala gehitzea, gaixo bakoitzak behar duen intsulina-kopurua odoleko azukre-mailaren arabera automatikoki kalkulatzeko.</p>
+                    <span class="tag">Software Ingeniaritza</span>
+                </article>
+
+                <article class="card project">
+                    <span class="date">2023ko ekainaren 18a</span>
+                    <h3>Earler</h3>
+                    <p class="title">Web irisgarritasuna probatzeko nabigatzaile-luzapena.</p>
+                    <p class="meta"><strong>Egilea:</strong> Julen Larrañaga Aguirrezabala<br><strong>Zuzendaria:</strong> Juan Miguel López Gil</p>
+                    <p class="goal">Webguneak guztiontzat irisgarriak diren ebaluatzen laguntzen duen Google Chrome tresna sortzea. Lehendik dauden aukera onenak batzen ditu eta funtzionalitate berriak eskaintzen ditu.</p>
+                    <span class="tag">Software Ingeniaritza</span>
+                </article>
+            </div>
+        </div>
+
+        <!-- AUTOEBALUAZIOA -->
+        <div id="page-autoebaluazioa" class="page-view">
+            <h1>Autoebaluazioa</h1>
+            <div class="card">
+                <p>Bete autoebaluazio-galdetegia Google Forms bidez.</p>
+                <a class="btn" href="#" target="_blank" rel="noopener">Ireki Google Forms, GrAL leiho berrian</a>
+            </div>
+        </div>
+
+        <!-- ABOUT US -->
+        <div id="page-aboutus" class="page-view">
+            <h1>About us</h1>
+
+            <h2>Taldea</h2>
+            <div class="team">
+                <div class="card member"><div class="avatar">EA</div><strong>Enara Anitua Goitiandia</strong></div>
+                <div class="card member"><div class="avatar">HS</div><strong>Hodei Salegi Aranguena</strong></div>
+                <div class="card member"><div class="avatar">JE</div><strong>Jon Elortegi Mendizabal</strong></div>
+            </div>
+
+            <h2>Webgunearen helburua</h2>
+            <div class="card">
+                <p>Gradu amaierako lana Informatika Ingeniaritzako gradua lortzeko beharrezkoa da. Laugarren mailan egiten da eta 12 kreditu balio ditu. Hasteko, 168 kreditu izan behar dira gainditurik. Lanak graduan zehar eskuratutako ezagutzak eta trebetasunak islatzen ditu.</p>
+                <p>Webgune honek GrAL lanari buruzko informazioa eta baliabideak eskaintzen ditu, ikasleentzat eta irakasleentzat.</p>
+                <p>Webgunea Pertsonen eta Konputagailuen arteko Elkarrekintza irakasgaiko proiektua da, eta bere helburuetako bat irakasgai horren edukiak lantzea da.</p>
+            </div>
+
+            <div class="notice"><strong>Oharra:</strong> Informazioa EHUren iturri ofizialetatik dator. Webgune honek ez du EHUren informazio-iturri ofizialak ordezkatu nahi, ezta haiekin bikoiztu ere.</div>
+        </div>
+
+    </main>
+
+    <footer>
+        <p class="first">Ingeniaritza informatikoko gradua, 3. Urtea - PKE, &copy; 2026</p>
+        <p>Hodei Salegi Aranguena · Enara Anitua Goitiandia · Jon Elortegi Mendizabal</p>
+        <div class="social">
+            <span>Instagram</span><span>TikTok</span><span>X</span><span>Facebook</span><span>LinkedIn</span><span>YouTube</span>
+        </div>
+    </footer>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById('menu');
+            var btn = document.getElementById('menuBtn');
+            var open = menu.classList.toggle('open');
+            btn.classList.toggle('open', open);
+            btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        }
+
+        function navigatePage(event, pageId) {
+            if (event) event.preventDefault();
+
+            document.querySelectorAll('.menu a').forEach(function (link) {
+                link.classList.toggle('active', link.getAttribute('data-page') === pageId);
+            });
+
+            document.querySelectorAll('.page-view').forEach(function (page) {
+                page.classList.remove('active-page');
+            });
+            var target = document.getElementById('page-' + pageId);
+            if (target) target.classList.add('active-page');
+
+            document.getElementById('menu').classList.remove('open');
+            var btn = document.getElementById('menuBtn');
+            btn.classList.remove('open');
+            btn.setAttribute('aria-expanded', 'false');
+            window.scrollTo(0, 0);
+        }
+    </script>
+</body>
+</html>
